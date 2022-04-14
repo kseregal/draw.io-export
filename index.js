@@ -23,11 +23,15 @@ const { argv } = yargs
     type: 'string',
   });
 
+console.log(argv._[0])
+console.log(path.extname(argv.output).replace(/^\./, ''))
+console.log(argv.output)
 if (argv._.length !== 1) {
   throw new Error('Exactly one file at a time');
 }
 
-module.exports = () => run({
+// module.exports = () => run({
+run({
   file: argv._[0],
   format: path.extname(argv.output).replace(/^\./, ''),
   path: argv.output,

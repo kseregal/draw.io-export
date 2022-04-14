@@ -16,11 +16,12 @@ const readFile = (file) => new Promise((resolve, reject) => {
 });
 
 const cachePath = (() => {
-  if (process.env.XDG_CACHE_HOME)
-    return path.join(process.env.XDG_CACHE_HOME, 'draw.io-export');
-  if (process.env.HOME)
-    return path.join(process.env.HOME, '.cache', 'draw.io-export');
   return path.join(__dirname, '.cache');
+  // if (process.env.XDG_CACHE_HOME)
+  //   return path.join(process.env.XDG_CACHE_HOME, 'draw.io-export');
+  // if (process.env.HOME)
+  //   return path.join(process.env.HOME, '.cache', 'draw.io-export');
+  // return path.join(__dirname, '.cache');
 })();
 
 const cacheExists = (t) => new Promise((resolve) => {
@@ -28,11 +29,12 @@ const cacheExists = (t) => new Promise((resolve) => {
 });
 
 const cacheDict = {
-  'https://app.diagrams.net/export3.html': 'export3.html',
-  'https://app.diagrams.net/js/app.min.js': 'app.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML': 'MathJax.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-MML-AM_HTMLorMML.js?V=2.7.5': 'TeX-MML-AM_HTMLorMML.js',
-  'https://cdn.mathjax.org/mathjax/contrib/a11y/accessibility-menu.js?V=2.7.5': 'accessibility-menu.js',
+  'http://localhost:8080/export3.html': 'export3.html',
+  // 'https://app.diagrams.net/export3.html': 'export3.html',
+  // 'https://app.diagrams.net/js/app.min.js': 'app.min.js',
+  // 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML': 'MathJax.js',
+  // 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-MML-AM_HTMLorMML.js?V=2.7.5': 'TeX-MML-AM_HTMLorMML.js',
+  // 'https://cdn.mathjax.org/mathjax/contrib/a11y/accessibility-menu.js?V=2.7.5': 'accessibility-menu.js',
 };
 
 const cache = async (f, t) => {
@@ -55,14 +57,15 @@ const cache = async (f, t) => {
 };
 
 module.exports = async ({ file, format, path: p }) => {
+  console.log('run',file, format, p)
   await Promise.all(_.toPairs(cacheDict).map(([f, t]) => cache(f, t)));
   const xml = await readFile(file);
 
   const browser = await puppeteer.launch({
     executablePath: process.env.CHROMIUM_PATH,
     headless: true,
-    args: ['--no-sandbox']                                                
-  });                               
+    args: ['--no-sandbox']
+  });
 
   try {
     const page = await browser.newPage();
@@ -85,7 +88,8 @@ module.exports = async ({ file, format, path: p }) => {
       }
     });
 
-    await page.goto('https://www.draw.io/export3.html', { waitUntil: 'networkidle0' });
+    // await page.goto('https://www.draw.io/export3.html', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:8080/export3.html', { waitUntil: 'networkidle0' });
 
     await page.evaluate((obj) => render(obj), {
       xml,
